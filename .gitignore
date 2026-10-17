@@ -1,0 +1,23 @@
+# Virtual environment
+venv/
+.venv/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Large model files (downloaded automatically by run_ui.bat)
+*.onnx
+*.bin
+
+# Audio outputs
+*.wav
+*.mp3
+
+# System and editor files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
