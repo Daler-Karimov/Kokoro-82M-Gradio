@@ -8,9 +8,12 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# Large model files (downloaded automatically by run_ui.bat)
+# Large model files (assembled automatically from parts by run_ui.bat)
 *.onnx
-*.bin
+!kokoro-v1.0.onnx.part*
+
+# Allow voice embedding binary file
+!voices-v1.0.bin
 
 # Audio outputs
 *.wav

@@ -28,8 +28,13 @@ call venv\Scripts\activate.bat
 
 REM 4. Install dependencies
 echo [2/4] Checking dependencies...
-python -m pip install --upgrade pip --quiet
-pip install -r requirements.txt --quiet
+if exist "wheels" (
+    echo Installing dependencies from local wheels ^(offline mode^)...
+    pip install --no-index --find-links=wheels -r requirements.txt --quiet
+) else (
+    python -m pip install --upgrade pip --quiet
+    pip install -r requirements.txt --quiet
+)
 if %errorlevel% neq 0 (
     echo [ERROR] Failed to install dependencies.
     pause
@@ -38,6 +43,18 @@ if %errorlevel% neq 0 (
 
 REM 5. Check model files
 echo [3/4] Checking model files...
+
+if not exist "kokoro-v1.0.onnx" (
+    if exist "kokoro-v1.0.onnx.part0" (
+        echo Assembling kokoro-v1.0.onnx from parts...
+        copy /b kokoro-v1.0.onnx.part* kokoro-v1.0.onnx >nul
+        if %errorlevel% neq 0 (
+            echo [ERROR] Failed to assemble kokoro-v1.0.onnx
+            pause
+            exit /b 1
+        )
+    )
+)
 
 if not exist "voices-v1.0.bin" (
     echo Downloading voices-v1.0.bin...

@@ -1,4 +1,4 @@
-# Kokoro-82M TTS — Local Setup / Локальный запуск
+# Kokoro-82M TTS — Standalone / Автономный запуск
 
 [Русский](#русский) | [English](#english)
 
@@ -6,6 +6,8 @@
 
 <a name="русский"></a>
 ## Русский
+
+> **Ветка `standalone`** содержит все необходимые библиотеки (`wheels/`) и файлы моделей (`voices-v1.0.bin`, `kokoro-v1.0.onnx.part*`), что позволяет запускать приложение на любом ПК с Windows **полностью без интернета**.
 
 Kokoro-82M — легковесная (82 миллиона параметров) и сверхбыстрая модель синтеза речи (Text-to-Speech) с открытыми весами и качеством звука 24 кГц.
 
@@ -34,17 +36,17 @@ Kokoro-82M — легковесная (82 миллиона параметров)
 run_ui.bat
 ```
 Скрипт автоматически:
-1. Проверяет наличие Python в системе.
+1. Проверяет наличие Python в системе (поддерживаются Python 3.10 — 3.14).
 2. Создает изолированное виртуальное окружение `venv` (если отсутствует).
-3. Устанавливает зависимости из `requirements.txt`.
-4. Скачивает недостающие файлы модели (`kokoro-v1.0.onnx` и `voices-v1.0.bin`).
+3. Устанавливает зависимости из локальной папки `wheels/` без подключения к сети.
+4. При необходимости собирает модель `kokoro-v1.0.onnx` из частей `.part*`.
 5. Запускает веб-интерфейс по адресу: http://127.0.0.1:7860
 
-#### Ручной запуск через терминал
+#### Ручной офлайн-запуск через терминал
 ```bash
 python -m venv venv
 venv\Scripts\activate
-pip install -r requirements.txt
+pip install --no-index --find-links=wheels -r requirements.txt
 python app.py
 ```
 
@@ -52,13 +54,13 @@ python app.py
 
 ```text
 Kokoro/
-├── app.py              # Веб-интерфейс на Gradio
-├── run_ui.bat          # Скрипт автоматической настройки и запуска
-├── requirements.txt    # Список Python-зависимостей
-├── kokoro-v1.0.onnx    # Веса модели (ONNX)
-├── voices-v1.0.bin     # Файл с 54 голосами
-├── test_output.wav     # Тестовый аудиофайл
-└── README.md           # Документация проекта
+├── app.py                   # Веб-интерфейс на Gradio
+├── run_ui.bat               # Скрипт настройки и запуска (с поддержкой офлайн-режима)
+├── requirements.txt         # Список Python-зависимостей
+├── wheels/                  # Офлайн-пакеты (wheels) для Python 3.10-3.14 на Windows
+├── kokoro-v1.0.onnx.part*   # Веса модели (ONNX), разбитые на части < 100 МБ для GitHub
+├── voices-v1.0.bin          # Файл с 54 голосами
+└── README.md                # Документация проекта
 ```
 
 ### Обозначение голосов
@@ -89,24 +91,9 @@ Kokoro/
 <a name="english"></a>
 ## English
 
-Kokoro-82M is a lightweight (82M parameters) and ultra-fast open-weight Text-to-Speech (TTS) model with 24 kHz audio quality.
+> **The `standalone` branch** includes all pre-downloaded Python wheels (`wheels/`) and model assets (`voices-v1.0.bin`, `kokoro-v1.0.onnx.part*`), allowing complete offline execution on Windows without downloading anything during setup.
 
-### About the Model
-- Architecture: StyleTTS 2 + ISTFTNet (decoder-only, non-diffusion).
-- Weights Size: ~320 MB (ONNX).
-- Resource Usage: Under 1 GB RAM/VRAM.
-- Inference Speed: 20–50x faster than real-time (RTF < 0.05).
-- License: Apache 2.0.
-- Supported Languages:
-  - English (American `a`, British `b`)
-  - French (`f`)
-  - Spanish (`e`)
-  - Italian (`i`)
-  - Brazilian Portuguese (`p`)
-  - Japanese (`j`)
-  - Mandarin Chinese (`z`)
-  - Hindi (`h`)
-  - Note: Russian language is not supported in the official model.
+Kokoro-82M is a lightweight (82M parameters) and ultra-fast open-weight Text-to-Speech (TTS) model with 24 kHz audio quality.
 
 ### Quick Start
 
@@ -116,52 +103,8 @@ Run the script:
 run_ui.bat
 ```
 The script will automatically:
-1. Verify Python availability on the system.
+1. Verify Python availability on the system (Python 3.10 to 3.14 supported).
 2. Create an isolated virtual environment (`venv`) if not present.
-3. Install dependencies from `requirements.txt`.
-4. Download missing model files (`kokoro-v1.0.onnx` and `voices-v1.0.bin`).
+3. Install dependencies completely offline from the local `wheels/` directory.
+4. Assemble `kokoro-v1.0.onnx` from parts if needed.
 5. Launch the web interface at: http://127.0.0.1:7860
-
-#### Manual Launch via Terminal
-```bash
-python -m venv venv
-venv\Scripts\activate
-pip install -r requirements.txt
-python app.py
-```
-
-### Project Structure
-
-```text
-Kokoro/
-├── app.py              # Gradio web interface
-├── run_ui.bat          # Automated setup and launch script
-├── requirements.txt    # Python dependencies list
-├── kokoro-v1.0.onnx    # Model weights (ONNX)
-├── voices-v1.0.bin     # Voice embeddings file (54 voices)
-├── test_output.wav     # Sample generated audio file
-└── README.md           # Project documentation
-```
-
-### Voice Naming Scheme
-
-The model provides 54 built-in voices. Voice identifiers follow a prefix pattern:
-- First character: Language or dialect
-  - `a` — American English
-  - `b` — British English
-  - `e` — Spanish
-  - `f` — French
-  - `i` — Italian
-  - `j` — Japanese
-  - `p` — Portuguese
-  - `z` — Mandarin Chinese
-  - `h` — Hindi
-- Second character: Gender
-  - `f` — Female
-  - `m` — Male
-
-Popular voices:
-- `af_heart` — balanced female voice (US)
-- `af_bella`, `af_nicole`, `af_sky` — soft female voices (US)
-- `am_adam`, `am_michael` — deep male voices (US)
-- `bf_alice`, `bm_george` — British voices (UK)
